@@ -9,7 +9,7 @@ namespace ScrollShooter
     {
         private static string statePath = "lastgame.json";
 
-        // Сохраняет текущее состояние игры (имя, счёт, статус квеста)
+
         public static void SaveGameState(string playerName, int score, bool questCompleted)
         {
             var state = new GameState
@@ -23,7 +23,6 @@ namespace ScrollShooter
             File.WriteAllText(statePath, json);
         }
 
-        // Загружает последнее состояние 
         public static GameState LoadGameState()
         {
             if (!File.Exists(statePath))
@@ -33,7 +32,6 @@ namespace ScrollShooter
         }
     }
 
-    // Класс для сериализации состояния
     public class GameState
     {
         public string PlayerName { get; set; }
