@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.Data.Sqlite; // если используете Microsoft.Data.Sqlite
+using Microsoft.Data.Sqlite;
 
 namespace ScrollShooter
 {
@@ -44,17 +44,19 @@ namespace ScrollShooter
                 default: Difficulty = Difficulty.Normal; break;
             }
 
-            MapWidth = 30;
-            MapHeight = 30;
+
+            MapWidth = Math.Min(30, Console.WindowWidth);
+            MapHeight = Math.Min(30, Console.WindowHeight);
             try
             {
                 Console.SetWindowSize(MapWidth, MapHeight);
                 Console.SetBufferSize(MapWidth, MapHeight);
             }
-            catch (NotSupportedException)
+            catch
             {
               
             }
+
             level = new Level(Difficulty, MapWidth, MapHeight);
             facade = new GameFacade(level);
 
@@ -65,10 +67,10 @@ namespace ScrollShooter
         {
             Console.CursorVisible = false;
 
-            // Инициализация БД
+     
             DatabaseManager.Initialize();
 
-            // Показываем таблицу лидеров перед началом игры
+        
             ShowTopRecords();
 
             Console.Clear();
@@ -138,7 +140,7 @@ namespace ScrollShooter
 
             foreach (var record in top)
             {
-                string questMark = record.QuestCompleted ? "✓" : "✗";
+                string questMark = record.QuestCompleted ? "[YES]" : "[NO]";
                 Console.WriteLine("{0,-20} {1,-10} {2,-15}",
                     record.Name.Length > 20 ? record.Name.Substring(0, 17) + "..." : record.Name,
                     record.Score,
