@@ -1,4 +1,4 @@
-﻿using Scroll_Shooter.Entities.Player;
+using Scroll_Shooter.Entities.Player;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,8 +8,7 @@ namespace ScrollShooter
     public class Level
     {
         public event Action<Enemy> OnEnemyKilled;
-        public event Action OnPlayerDeath;   // Событие смерти игрока
-
+        public event Action OnPlayerDeath;   
         private int mapWidth;
         private int mapHeight;
         private Difficulty difficulty;
@@ -22,7 +21,7 @@ namespace ScrollShooter
         private int enemySpawnTimer = 0;
         private int enemySpawnDelay = 10;
 
-        // Фабрики для создания врагов
+       
         private EnemyFactory smallEnemyFactory;
         private EnemyFactory bigEnemyFactory;
 
@@ -34,13 +33,26 @@ namespace ScrollShooter
             this.difficulty = difficulty;
             this.mapWidth = mapWidth;
             this.mapHeight = mapHeight;
+            this.difficulty = difficulty;
 
+           
+            switch (difficulty)
+            {
+                case Difficulty.Easy:
+                    enemySpawnDelay = 20;   
+                    break;
+                case Difficulty.Hard:
+                    enemySpawnDelay = 5; 
+                    break;
+                default:
+                    enemySpawnDelay = 10;
+                    break;
+            }
             player = new Player(mapWidth / 2, mapHeight - 4, mapWidth);
             quest = new Quest();
             quest.Subscribe(this);
             entities.Add(player);
 
-            // Инициализация фабрик
             smallEnemyFactory = new SmallEnemyFactory();
             bigEnemyFactory = new BigEnemyFactory();
         }
@@ -53,6 +65,8 @@ namespace ScrollShooter
                 entities.Add(new Bullet(player.X, player.Y - 1));
             }
         }
+
+
 
         public void UpdateEntities()
         {
@@ -68,15 +82,19 @@ namespace ScrollShooter
                 Enemy enemy;
                 if (random.Next(2) == 0)
                 {
-                    // Создаём малого врага через фабрику
+      IEnemyBehavior behavior;
+                    if (difficulty == Difficulty.Hard)
+                        behavior = new ZigZagBehavior();
+                    else
+                        behavior = new StraightBehavior();
+
                     enemy = smallEnemyFactory.CreateEnemy(
-                        random.Next(0, mapWidth - 3), 0, 3, null);
+                        random.Next(0, mapWidth - 3), 0, 3, behavior);
                 }
                 else
                 {
-                    // Создаём большого врага через фабрику
                     enemy = bigEnemyFactory.CreateEnemy(
-                        random.Next(0, mapWidth - 5), 0, 4, null);
+                        random.Next(0, mapWidth - 5), 0, 4, new ZigZagBehavior());
                 }
                 entities.Add(enemy);
                 enemySpawnTimer = 0;
@@ -139,7 +157,7 @@ namespace ScrollShooter
 
                         if (health.IsDead)
                         {
-                            // Уведомляем GameManager о смерти игрока
+                          
                             OnPlayerDeath?.Invoke();
                         }
                     }
