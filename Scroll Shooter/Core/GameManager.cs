@@ -46,9 +46,15 @@ namespace ScrollShooter
 
             MapWidth = 30;
             MapHeight = 30;
-            Console.SetWindowSize(MapWidth, MapHeight);
-            Console.SetBufferSize(MapWidth, MapHeight);
-
+            try
+            {
+                Console.SetWindowSize(MapWidth, MapHeight);
+                Console.SetBufferSize(MapWidth, MapHeight);
+            }
+            catch (NotSupportedException)
+            {
+              
+            }
             level = new Level(Difficulty, MapWidth, MapHeight);
             facade = new GameFacade(level);
 
